@@ -14,8 +14,13 @@ import (
 var regexpEmail = regexp.MustCompile(`.+@.+`)
 
 func TestEmailForwardPath(t *testing.T) {
-	assert.Equal(t, "/1010/domains/example.com/email_forwards", emailForwardPath("1010", "example.com", 0))
-	assert.Equal(t, "/1010/domains/example.com/email_forwards/2", emailForwardPath("1010", "example.com", 2))
+	path, err := emailForwardsPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/email_forwards", path)
+
+	path, err = emailForwardPath("1010", "example.com", 2)
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/email_forwards/2", path)
 }
 
 func TestDomainsService_EmailForwardsList(t *testing.T) {
@@ -110,7 +115,8 @@ func TestDomainsService_GetEmailForward(t *testing.T) {
 		From:      "example@dnsimple.xyz",
 		To:        "example@example.com",
 		CreatedAt: "2021-01-25T13:54:40Z",
-		UpdatedAt: "2021-01-25T13:54:40Z"}
+		UpdatedAt: "2021-01-25T13:54:40Z",
+	}
 	assert.Equal(t, wantSingle, forward)
 }
 

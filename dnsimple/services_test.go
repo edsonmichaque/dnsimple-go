@@ -11,8 +11,16 @@ import (
 )
 
 func TestServicePath(t *testing.T) {
-	assert.Equal(t, "/services", servicePath(""))
-	assert.Equal(t, "/services/name", servicePath("name"))
+	var (
+		path string
+		err  error
+	)
+
+	assert.Equal(t, "/services", servicesPath())
+
+	path, err = servicePath("name")
+	assert.NoError(t, err)
+	assert.Equal(t, "/services/name", path)
 }
 
 func TestServicesService_List(t *testing.T) {

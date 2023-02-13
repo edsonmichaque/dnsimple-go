@@ -138,8 +138,7 @@ func TestClient_NewRequest_CustomUserAgent(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("AwesomeClient %s", defaultUserAgent), req.Header.Get("User-Agent"))
 }
 
-type badObject struct {
-}
+type badObject struct{}
 
 func (o *badObject) MarshalJSON() ([]byte, error) {
 	return nil, errors.New("Bad object is bad")

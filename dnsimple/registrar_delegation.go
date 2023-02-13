@@ -2,7 +2,6 @@ package dnsimple
 
 import (
 	"context"
-	"fmt"
 )
 
 // Delegation represents a list of name servers that correspond to a domain delegation.
@@ -24,7 +23,13 @@ type VanityDelegationResponse struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/delegation/#get
 func (s *RegistrarService) GetDomainDelegation(ctx context.Context, accountID string, domainName string) (*DelegationResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/delegation", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/delegation")
+
 	delegationResponse := &DelegationResponse{}
 
 	resp, err := s.client.get(ctx, path, delegationResponse)
@@ -40,7 +45,13 @@ func (s *RegistrarService) GetDomainDelegation(ctx context.Context, accountID st
 //
 // See https://developer.dnsimple.com/v2/registrar/delegation/#get
 func (s *RegistrarService) ChangeDomainDelegation(ctx context.Context, accountID string, domainName string, newDelegation *Delegation) (*DelegationResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/delegation", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/delegation")
+
 	delegationResponse := &DelegationResponse{}
 
 	resp, err := s.client.put(ctx, path, newDelegation, delegationResponse)
@@ -56,7 +67,13 @@ func (s *RegistrarService) ChangeDomainDelegation(ctx context.Context, accountID
 //
 // See https://developer.dnsimple.com/v2/registrar/delegation/#delegateToVanity
 func (s *RegistrarService) ChangeDomainDelegationToVanity(ctx context.Context, accountID string, domainName string, newDelegation *Delegation) (*VanityDelegationResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/delegation/vanity", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/delegation/vanity")
+
 	delegationResponse := &VanityDelegationResponse{}
 
 	resp, err := s.client.put(ctx, path, newDelegation, delegationResponse)
@@ -72,7 +89,13 @@ func (s *RegistrarService) ChangeDomainDelegationToVanity(ctx context.Context, a
 //
 // See https://developer.dnsimple.com/v2/registrar/delegation/#dedelegateFromVanity
 func (s *RegistrarService) ChangeDomainDelegationFromVanity(ctx context.Context, accountID string, domainName string) (*VanityDelegationResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/delegation/vanity", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/delegation/vanity")
+
 	delegationResponse := &VanityDelegationResponse{}
 
 	resp, err := s.client.delete(ctx, path, nil, nil)

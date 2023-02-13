@@ -372,6 +372,34 @@ func addURLQueryOptions(path string, options interface{}) (string, error) {
 	return u.String(), nil
 }
 
+func checkEmptyString(name, value string) error {
+	if value == "" {
+		return fmt.Errorf("%s should not be empty", name)
+	}
+
+	return nil
+}
+
+func checkEmptyInt64(name string, value int64) error {
+	if value == 0 {
+		return fmt.Errorf("%v should not be empty", name)
+	}
+
+	return nil
+}
+
+func checkDomainPathParams(accountID, domainIdentifier string) error {
+	if err := checkEmptyString("accountID", accountID); err != nil {
+		return err
+	}
+
+	if err := checkEmptyString("domainIdentifier", domainIdentifier); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Int is a helper routine that allocates a new int value
 // to store v and returns a pointer to it.
 func Int(v int) *int { return &v }

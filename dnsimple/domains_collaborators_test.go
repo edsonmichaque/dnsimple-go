@@ -11,8 +11,13 @@ import (
 )
 
 func TestCollaboratorPath(t *testing.T) {
-	assert.Equal(t, "/1010/domains/example.com/collaborators", collaboratorPath("1010", "example.com", 0))
-	assert.Equal(t, "/1010/domains/example.com/collaborators/2", collaboratorPath("1010", "example.com", 2))
+	path, err := collaboratorsPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/collaborators", path)
+
+	path, err = collaboratorPath("1010", "example.com", 2)
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/collaborators/2", path)
 }
 
 func TestDomainsService_ListCollaborators(t *testing.T) {

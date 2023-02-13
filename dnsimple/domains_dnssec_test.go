@@ -10,7 +10,9 @@ import (
 )
 
 func TestDnssecPath(t *testing.T) {
-	assert.Equal(t, "/1010/domains/example.com/dnssec", dnssecPath("1010", "example.com"))
+	path, err := dnssecPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/dnssec", path)
 }
 
 func TestDomainsService_EnableDnssec(t *testing.T) {

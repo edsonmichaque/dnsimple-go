@@ -37,12 +37,16 @@ type ServiceSetting struct {
 	Password    bool   `json:"password,omitempty"`
 }
 
-func servicePath(serviceIdentifier string) (path string) {
-	path = "/services"
-	if serviceIdentifier != "" {
-		path += fmt.Sprintf("/%v", serviceIdentifier)
+func servicesPath() string {
+	return "/services"
+}
+
+func servicePath(serviceIdentifier string) (string, error) {
+	if err := checkEmptyString("serviceIdentifier", serviceIdentifier); err != nil {
+		return "", err
 	}
-	return
+
+	return fmt.Sprintf("%v/%v", servicesPath(), serviceIdentifier), nil
 }
 
 // ServiceResponse represents a response from an API method that returns a Service struct.
@@ -61,7 +65,7 @@ type ServicesResponse struct {
 //
 // See https://developer.dnsimple.com/v2/services/#list
 func (s *ServicesService) ListServices(ctx context.Context, options *ListOptions) (*ServicesResponse, error) {
-	path := versioned(servicePath(""))
+	path := versioned(servicesPath())
 	servicesResponse := &ServicesResponse{}
 
 	path, err := addURLQueryOptions(path, options)
@@ -82,7 +86,13 @@ func (s *ServicesService) ListServices(ctx context.Context, options *ListOptions
 //
 // See https://developer.dnsimple.com/v2/services/#get
 func (s *ServicesService) GetService(ctx context.Context, serviceIdentifier string) (*ServiceResponse, error) {
-	path := versioned(servicePath(serviceIdentifier))
+	path, err := servicePath(serviceIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	serviceResponse := &ServiceResponse{}
 
 	resp, err := s.client.get(ctx, path, serviceResponse)

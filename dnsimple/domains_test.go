@@ -11,8 +11,18 @@ import (
 )
 
 func TestDomainPath(t *testing.T) {
-	assert.Equal(t, "/1010/domains", domainPath("1010", ""))
-	assert.Equal(t, "/1010/domains/example.com", domainPath("1010", "example.com"))
+	var (
+		path string
+		err  error
+	)
+
+	path, err = domainsPath("1010")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains", path)
+
+	path, err = domainPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com", path)
 }
 
 func TestDomainsService_ListDomains(t *testing.T) {
@@ -124,7 +134,8 @@ func TestDomainsService_GetDomain(t *testing.T) {
 		PrivateWhois: false,
 		ExpiresAt:    "2021-06-05T02:15:00Z",
 		CreatedAt:    "2020-06-04T19:15:14Z",
-		UpdatedAt:    "2020-06-04T19:15:21Z"}
+		UpdatedAt:    "2020-06-04T19:15:21Z",
+	}
 	assert.Equal(t, wantSingle, domain)
 }
 

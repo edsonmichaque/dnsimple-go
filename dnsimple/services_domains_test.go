@@ -11,8 +11,18 @@ import (
 )
 
 func TestDomainServices_domainServicesPath(t *testing.T) {
-	assert.Equal(t, "/1010/domains/example.com/services", domainServicesPath("1010", "example.com", ""))
-	assert.Equal(t, "/1010/domains/example.com/services/1", domainServicesPath("1010", "example.com", "1"))
+	var (
+		path string
+		err  error
+	)
+
+	path, err = domainServicesPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/services", path)
+
+	path, err = domainServicePath("1010", "example.com", "1")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/services/1", path)
 }
 
 func TestServicesService_AppliedServices(t *testing.T) {

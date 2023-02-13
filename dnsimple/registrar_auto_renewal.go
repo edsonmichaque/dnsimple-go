@@ -2,14 +2,19 @@ package dnsimple
 
 import (
 	"context"
-	"fmt"
 )
 
 // EnableDomainAutoRenewal enables auto-renewal for the domain.
 //
 // See https://developer.dnsimple.com/v2/registrar/auto-renewal/#enable
 func (s *RegistrarService) EnableDomainAutoRenewal(ctx context.Context, accountID string, domainName string) (*DomainResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/auto_renewal", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/auto_renewal")
+
 	domainResponse := &DomainResponse{}
 
 	resp, err := s.client.put(ctx, path, nil, nil)
@@ -25,7 +30,13 @@ func (s *RegistrarService) EnableDomainAutoRenewal(ctx context.Context, accountI
 //
 // See https://developer.dnsimple.com/v2/registrar/auto-renewal/#enable
 func (s *RegistrarService) DisableDomainAutoRenewal(ctx context.Context, accountID string, domainName string) (*DomainResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/auto_renewal", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/auto_renewal")
+
 	domainResponse := &DomainResponse{}
 
 	resp, err := s.client.delete(ctx, path, nil, nil)

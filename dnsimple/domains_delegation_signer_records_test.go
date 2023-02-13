@@ -11,8 +11,18 @@ import (
 )
 
 func TestDelegationSignerRecordPath(t *testing.T) {
-	assert.Equal(t, "/1010/domains/example.com/ds_records", delegationSignerRecordPath("1010", "example.com", 0))
-	assert.Equal(t, "/1010/domains/example.com/ds_records/2", delegationSignerRecordPath("1010", "example.com", 2))
+	var (
+		path string
+		err  error
+	)
+
+	path, err = delegationSignerRecordsPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/ds_records", path)
+
+	path, err = delegationSignerRecordPath("1010", "example.com", 2)
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/domains/example.com/ds_records/2", path)
 }
 
 func TestDomainsService_ListDelegationSignerRecords(t *testing.T) {
@@ -111,7 +121,8 @@ func TestDomainsService_GetDelegationSignerRecord(t *testing.T) {
 		Keytag:     "44620",
 		PublicKey:  "",
 		CreatedAt:  "2017-03-03T13:49:58Z",
-		UpdatedAt:  "2017-03-03T13:49:58Z"}
+		UpdatedAt:  "2017-03-03T13:49:58Z",
+	}
 	assert.Equal(t, wantSingle, dsRecord)
 }
 

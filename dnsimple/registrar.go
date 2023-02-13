@@ -26,11 +26,42 @@ type DomainCheckResponse struct {
 	Data *DomainCheck `json:"data"`
 }
 
+func registrarDomainPath(accountID, domainName string) (string, error) {
+	if err := checkEmptyString("accountID", accountID); err != nil {
+		return "", err
+	}
+
+	if err := checkEmptyString("domainName", domainName); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("/%v/registrar/domains/%v", accountID, domainName), nil
+}
+
+func registrarDomainTransferPath(accountID, domainName string, domainTransferID int64) (string, error) {
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return "", err
+	}
+
+	if err := checkEmptyInt64("domainTransferID", domainTransferID); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%v/transfers/%v", path, domainTransferID), nil
+}
+
 // CheckDomain checks a domain name.
 //
 // See https://developer.dnsimple.com/v2/registrar/#check
 func (s *RegistrarService) CheckDomain(ctx context.Context, accountID string, domainName string) (*DomainCheckResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/check", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/check")
+
 	checkResponse := &DomainCheckResponse{}
 
 	resp, err := s.client.get(ctx, path, checkResponse)
@@ -74,8 +105,13 @@ type DomainPremiumPriceOptions struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/#premium-price
 func (s *RegistrarService) GetDomainPremiumPrice(ctx context.Context, accountID string, domainName string, options *DomainPremiumPriceOptions) (*DomainPremiumPriceResponse, error) {
-	var err error
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/premium_price", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/premium_price")
+
 	priceResponse := &DomainPremiumPriceResponse{}
 
 	if options != nil {
@@ -113,7 +149,13 @@ type DomainPriceResponse struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/#getDomainPrices
 func (s *RegistrarService) GetDomainPrices(ctx context.Context, accountID string, domainName string) (*DomainPriceResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/prices", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/prices")
+
 	pricesResponse := &DomainPriceResponse{}
 
 	resp, err := s.client.get(ctx, path, pricesResponse)
@@ -165,7 +207,13 @@ type RegisterDomainInput struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/#registerDomain
 func (s *RegistrarService) RegisterDomain(ctx context.Context, accountID string, domainName string, input *RegisterDomainInput) (*DomainRegistrationResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/registrations", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/registrations")
+
 	registrationResponse := &DomainRegistrationResponse{}
 
 	// TODO: validate mandatory attributes RegistrantID
@@ -222,7 +270,13 @@ type TransferDomainInput struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/#transferDomain
 func (s *RegistrarService) TransferDomain(ctx context.Context, accountID string, domainName string, input *TransferDomainInput) (*DomainTransferResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/transfers", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/transfers")
+
 	transferResponse := &DomainTransferResponse{}
 
 	// TODO: validate mandatory attributes RegistrantID
@@ -240,7 +294,11 @@ func (s *RegistrarService) TransferDomain(ctx context.Context, accountID string,
 //
 // See https://developer.dnsimple.com/v2/registrar/#getDomainTransfer
 func (s *RegistrarService) GetDomainTransfer(ctx context.Context, accountID string, domainName string, domainTransferID int64) (*DomainTransferResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/transfers/%v", accountID, domainName, domainTransferID))
+	path, err := registrarDomainTransferPath(accountID, domainName, domainTransferID)
+	if err != nil {
+		return nil, err
+	}
+
 	transferResponse := &DomainTransferResponse{}
 
 	resp, err := s.client.get(ctx, path, transferResponse)
@@ -256,7 +314,13 @@ func (s *RegistrarService) GetDomainTransfer(ctx context.Context, accountID stri
 //
 // See https://developer.dnsimple.com/v2/registrar/#cancelDomainTransfer
 func (s *RegistrarService) CancelDomainTransfer(ctx context.Context, accountID string, domainName string, domainTransferID int64) (*DomainTransferResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/transfers/%v", accountID, domainName, domainTransferID))
+	path, err := registrarDomainTransferPath(accountID, domainName, domainTransferID)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	transferResponse := &DomainTransferResponse{}
 
 	resp, err := s.client.delete(ctx, path, nil, transferResponse)
@@ -278,7 +342,13 @@ type DomainTransferOutResponse struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/#authorizeDomainTransferOut
 func (s *RegistrarService) TransferDomainOut(ctx context.Context, accountID string, domainName string) (*DomainTransferOutResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/authorize_transfer_out", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/authorize_transfer_out")
+
 	transferResponse := &DomainTransferOutResponse{}
 
 	resp, err := s.client.post(ctx, path, nil, nil)
@@ -319,7 +389,13 @@ type RenewDomainInput struct {
 //
 // See https://developer.dnsimple.com/v2/registrar/#renewDomain
 func (s *RegistrarService) RenewDomain(ctx context.Context, accountID string, domainName string, input *RenewDomainInput) (*DomainRenewalResponse, error) {
-	path := versioned(fmt.Sprintf("/%v/registrar/domains/%v/renewals", accountID, domainName))
+	path, err := registrarDomainPath(accountID, domainName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path + "/renewals")
+
 	renewalResponse := &DomainRenewalResponse{}
 
 	resp, err := s.client.post(ctx, path, input, renewalResponse)

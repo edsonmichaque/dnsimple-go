@@ -150,7 +150,7 @@ func (d *ContactEventData) unmarshalEventData(payload []byte) error {
 // DNSSECEventData represents the data node for a DNSSEC event.
 type DNSSECEventData struct {
 	DelegationSignerRecord *dnsimple.DelegationSignerRecord `json:"delegation_signer_record"`
-	//DNSSECConfig           *dnsimple.DNSSECConfig           `json:"dnssec"`
+	// DNSSECConfig           *dnsimple.DNSSECConfig           `json:"dnssec"`
 }
 
 func (d *DNSSECEventData) unmarshalEventData(payload []byte) error {

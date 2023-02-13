@@ -36,12 +36,29 @@ type ZoneRecordAttributes struct {
 	Regions  []string `json:"regions,omitempty"`
 }
 
-func zoneRecordPath(accountID string, zoneName string, recordID int64) (path string) {
-	path = fmt.Sprintf("/%v/zones/%v/records", accountID, zoneName)
-	if recordID != 0 {
-		path += fmt.Sprintf("/%v", recordID)
+func zoneRecordsPath(accountID string, zoneName string) (string, error) {
+	if err := checkEmptyString("accountID", accountID); err != nil {
+		return "", err
 	}
-	return
+
+	if err := checkEmptyString("zoneName", zoneName); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("/%v/zones/%v/records", accountID, zoneName), nil
+}
+
+func zoneRecordPath(accountID string, zoneName string, recordID int64) (string, error) {
+	path, err := zoneRecordsPath(accountID, zoneName)
+	if err != nil {
+		return "", err
+	}
+
+	if err := checkEmptyInt64("recordID", recordID); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%v/%v", path, recordID), nil
 }
 
 // ZoneRecordResponse represents a response from an API method that returns a ZoneRecord struct.
@@ -76,10 +93,16 @@ type ZoneRecordListOptions struct {
 //
 // See https://developer.dnsimple.com/v2/zones/records/#listZoneRecords
 func (s *ZonesService) ListRecords(ctx context.Context, accountID string, zoneName string, options *ZoneRecordListOptions) (*ZoneRecordsResponse, error) {
-	path := versioned(zoneRecordPath(accountID, zoneName, 0))
+	path, err := zoneRecordsPath(accountID, zoneName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	recordsResponse := &ZoneRecordsResponse{}
 
-	path, err := addURLQueryOptions(path, options)
+	path, err = addURLQueryOptions(path, options)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +120,13 @@ func (s *ZonesService) ListRecords(ctx context.Context, accountID string, zoneNa
 //
 // See https://developer.dnsimple.com/v2/zones/records/#createZoneRecord
 func (s *ZonesService) CreateRecord(ctx context.Context, accountID string, zoneName string, recordAttributes ZoneRecordAttributes) (*ZoneRecordResponse, error) {
-	path := versioned(zoneRecordPath(accountID, zoneName, 0))
+	path, err := zoneRecordsPath(accountID, zoneName)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	recordResponse := &ZoneRecordResponse{}
 
 	resp, err := s.client.post(ctx, path, recordAttributes, recordResponse)
@@ -113,7 +142,13 @@ func (s *ZonesService) CreateRecord(ctx context.Context, accountID string, zoneN
 //
 // See https://developer.dnsimple.com/v2/zones/records/#getZoneRecord
 func (s *ZonesService) GetRecord(ctx context.Context, accountID string, zoneName string, recordID int64) (*ZoneRecordResponse, error) {
-	path := versioned(zoneRecordPath(accountID, zoneName, recordID))
+	path, err := zoneRecordPath(accountID, zoneName, recordID)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	recordResponse := &ZoneRecordResponse{}
 
 	resp, err := s.client.get(ctx, path, recordResponse)
@@ -129,10 +164,15 @@ func (s *ZonesService) GetRecord(ctx context.Context, accountID string, zoneName
 //
 // See https://developer.dnsimple.com/v2/zones/records/#updateZoneRecord
 func (s *ZonesService) UpdateRecord(ctx context.Context, accountID string, zoneName string, recordID int64, recordAttributes ZoneRecordAttributes) (*ZoneRecordResponse, error) {
-	path := versioned(zoneRecordPath(accountID, zoneName, recordID))
+	path, err := zoneRecordPath(accountID, zoneName, recordID)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	recordResponse := &ZoneRecordResponse{}
 	resp, err := s.client.patch(ctx, path, recordAttributes, recordResponse)
-
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +185,13 @@ func (s *ZonesService) UpdateRecord(ctx context.Context, accountID string, zoneN
 //
 // See https://developer.dnsimple.com/v2/zones/records/#deleteZoneRecord
 func (s *ZonesService) DeleteRecord(ctx context.Context, accountID string, zoneName string, recordID int64) (*ZoneRecordResponse, error) {
-	path := versioned(zoneRecordPath(accountID, zoneName, recordID))
+	path, err := zoneRecordPath(accountID, zoneName, recordID)
+	if err != nil {
+		return nil, err
+	}
+
+	path = versioned(path)
+
 	recordResponse := &ZoneRecordResponse{}
 
 	resp, err := s.client.delete(ctx, path, nil, nil)

@@ -11,8 +11,18 @@ import (
 )
 
 func TestDomainPushPath(t *testing.T) {
-	assert.Equal(t, "/1010/pushes", domainPushPath("1010", 0))
-	assert.Equal(t, "/1010/pushes/1", domainPushPath("1010", 1))
+	var (
+		path string
+		err  error
+	)
+
+	path, err = domainPushesPath("1010")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/pushes", path)
+
+	path, err = domainPushPath("1010", 1)
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/pushes/1", path)
 }
 
 func TestDomainsService_InitiatePush(t *testing.T) {

@@ -11,8 +11,18 @@ import (
 )
 
 func TestZoneRecordPath(t *testing.T) {
-	assert.Equal(t, "/1010/zones/example.com/records", zoneRecordPath("1010", "example.com", 0))
-	assert.Equal(t, "/1010/zones/example.com/records/1", zoneRecordPath("1010", "example.com", 1))
+	var (
+		path string
+		err  error
+	)
+
+	path, err = zoneRecordsPath("1010", "example.com")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/zones/example.com/records", path)
+
+	path, err = zoneRecordPath("1010", "example.com", 1)
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/zones/example.com/records/1", path)
 }
 
 func TestZonesService_ListRecords(t *testing.T) {
@@ -229,7 +239,8 @@ func TestZonesService_GetRecord(t *testing.T) {
 		SystemRecord: false,
 		Regions:      []string{"SV1", "IAD"},
 		CreatedAt:    "2016-10-05T09:51:35Z",
-		UpdatedAt:    "2016-10-05T09:51:35Z"}
+		UpdatedAt:    "2016-10-05T09:51:35Z",
+	}
 	assert.Equal(t, wantSingle, record)
 }
 
