@@ -11,8 +11,18 @@ import (
 )
 
 func TestTemplatePath(t *testing.T) {
-	assert.Equal(t, "/1010/templates", templatePath("1010", ""))
-	assert.Equal(t, "/1010/templates/1", templatePath("1010", "1"))
+	var (
+		path string
+		err  error
+	)
+
+	path, err = templatesPath("1010")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/templates", path)
+
+	path, err = templatePath("1010", "1")
+	assert.NoError(t, err)
+	assert.Equal(t, "/1010/templates/1", path)
 }
 
 func TestTemplatesService_List(t *testing.T) {
