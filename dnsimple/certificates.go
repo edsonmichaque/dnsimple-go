@@ -103,7 +103,7 @@ func letsencryptCertificatesPath(accountID, domainIdentifier string) (string, er
 }
 
 func letsencryptCertificatePath(accountID, domainIdentifier string, certificateID int64) (string, error) {
-	path, err := certificatesPath(accountID, domainIdentifier)
+	path, err := letsencryptCertificatesPath(accountID, domainIdentifier)
 	if err != nil {
 		return "", err
 	}

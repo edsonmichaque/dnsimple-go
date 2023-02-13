@@ -2,6 +2,7 @@ package dnsimple
 
 import (
 	"context"
+	"fmt"
 )
 
 // ApplyTemplate applies a template to the given domain.
@@ -13,7 +14,11 @@ func (s *TemplatesService) ApplyTemplate(ctx context.Context, accountID string, 
 		return nil, err
 	}
 
-	path = versioned(path + "/templates")
+	if err := checkEmptyString("templateIdentifier", templateIdentifier); err != nil {
+		return nil, err
+	}
+
+	path = versioned(fmt.Sprintf("%v/templates/%v", path, templateIdentifier))
 
 	templateResponse := &TemplateResponse{}
 

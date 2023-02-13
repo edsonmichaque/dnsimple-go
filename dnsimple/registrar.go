@@ -299,6 +299,8 @@ func (s *RegistrarService) GetDomainTransfer(ctx context.Context, accountID stri
 		return nil, err
 	}
 
+	path = versioned(path)
+
 	transferResponse := &DomainTransferResponse{}
 
 	resp, err := s.client.get(ctx, path, transferResponse)

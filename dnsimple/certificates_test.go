@@ -18,6 +18,18 @@ func TestCertificatePath(t *testing.T) {
 	path, err = certificatePath("1010", "example.com", 2)
 	assert.NoError(t, err)
 	assert.Equal(t, "/1010/domains/example.com/certificates/2", path)
+
+	path, err = certificatePath("", "example.com", 2)
+	assert.Error(t, err)
+	assert.Empty(t, path)
+
+	path, err = certificatePath("1010", "", 2)
+	assert.Error(t, err)
+	assert.Empty(t, path)
+
+	path, err = certificatePath("1010", "example.com", 0)
+	assert.Error(t, err)
+	assert.Empty(t, path)
 }
 
 func TestCertificatesService_ListCertificates(t *testing.T) {

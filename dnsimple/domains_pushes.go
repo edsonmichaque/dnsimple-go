@@ -59,7 +59,7 @@ type DomainPushAttributes struct {
 //
 // See https://developer.dnsimple.com/v2/domains/pushes/#initiateDomainPush
 func (s *DomainsService) InitiatePush(ctx context.Context, accountID, domainID string, pushAttributes DomainPushAttributes) (*DomainPushResponse, error) {
-	path, err := collaboratorsPath(accountID, domainID)
+	path, err := domainPath(accountID, domainID)
 	if err != nil {
 		return nil, err
 	}
